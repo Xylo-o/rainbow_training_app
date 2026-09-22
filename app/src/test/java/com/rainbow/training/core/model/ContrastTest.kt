@@ -22,7 +22,18 @@ class ContrastTest {
     fun `jasne tla dostaja czarna cyfre, ciemne biala`() {
         assertEquals(Contrast.BLACK, Contrast.bestContentColor(StimulusColor.YELLOW.argb))
         assertEquals(Contrast.WHITE, Contrast.bestContentColor(StimulusColor.PURPLE.argb))
-        assertEquals(Contrast.WHITE, Contrast.bestContentColor(StimulusColor.BLUE.argb))
+    }
+
+    @Test
+    fun `wybrany kolor cyfry bije alternatywe na kontrascie`() {
+        StimulusColor.ALL.forEach { color ->
+            val chosen = color.contentArgb
+            val rejected = if (chosen == Contrast.WHITE) Contrast.BLACK else Contrast.WHITE
+            assertTrue(
+                "Dla ${color.displayName} lepszy bylby drugi wariant",
+                Contrast.ratio(color.argb, chosen) >= Contrast.ratio(color.argb, rejected),
+            )
+        }
     }
 
     @Test

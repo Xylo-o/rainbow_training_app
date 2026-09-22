@@ -5,10 +5,14 @@ on:
     branches:
       - main
       - 'claude/**'
+    paths-ignore:
+      # Commit z gotowym plikiem APK nie ma budowac sam siebie.
+      - 'dist/**'
   workflow_dispatch:
 
 permissions:
-  contents: read
+  # Zbudowany APK jest dopisywany do katalogu dist/ na tej samej galezi.
+  contents: write
 
 concurrency:
   group: build-apk-${{ github.ref }}
@@ -64,11 +68,30 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-      - name: Opublikuj raporty z testów
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: raporty-testow
-          path: app/build/reports/tests/
-          if-no-files-found: ignore
-          retention-days: 7
+      - name: Dopisz APK do gałęzi
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f dist/rainbow-trening.apk
+          if git diff --cached --quiet; then
+            echo "APK bez zmian - nie ma czego commitowac."
+          else
+            git commit -m "build: APK z ${GITHUB_SHA::7} [skip ci]"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
+
+      - name: Pokaż nieudane testy
+        if: failure()
+        run: |
+          shopt -s nullglob
+          found=0
+          for f in app/build/test-results/*/TEST-*.xml; do
+            if grep -q "<failure" "$f"; then
+              found=1
+              echo "::group::$f"
+              cat "$f"
+              echo "::endgroup::"
+            fi
+          done
+          [ "$found" = "0" ] && echo "Brak raportow z nieudanymi testami."
+          exit 0
