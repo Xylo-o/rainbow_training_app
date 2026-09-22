@@ -29,6 +29,9 @@ object Contrast {
     /** Barwa dopelniajaca ma byc nasycona, nawet jesli tlo takie nie jest. */
     private const val MIN_SATURATION = 0.85
 
+    /** Ponizej tego nasycenia kolor uznajemy za pozbawiony barwy (biel, czern, szarosc). */
+    private const val ACHROMATIC_SATURATION = 0.05
+
     /**
      * Kandydaci na jasnosc barwy dopelniajacej, od najbardziej soczystych (0.5) ku skrajnym.
      * Bierzemy pierwszego, ktory spelnia prog kontrastu - czyli najzywszy z czytelnych.
@@ -78,6 +81,12 @@ object Contrast {
      */
     fun complementary(backgroundArgb: Long, minRatio: Double = MIN_DIGIT_RATIO): Long {
         val (hue, saturation, _) = toHsl(backgroundArgb)
+
+        // Biel, czern i szarosci nie maja wlasnej barwy, wiec obracanie odcienia o 180 stopni
+        // dawaloby kolor wzięty z niczego. Ich prawdziwym negatywem jest druga skrajnosc
+        // jasnosci: czern na bieli, biel na czerni.
+        if (saturation < ACHROMATIC_SATURATION) return bestContentColor(backgroundArgb)
+
         val complementHue = (hue + 180.0) % 360.0
         val vividSaturation = max(saturation, MIN_SATURATION)
 

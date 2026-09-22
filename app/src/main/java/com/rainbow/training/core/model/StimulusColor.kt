@@ -1,29 +1,34 @@
 package com.rainbow.training.core.model
 
 /**
- * Paleta bodzcow: 8 barw rozlozonych rownomiernie po kole barw, dobranych tak, by bylo je
- * latwo rozroznic i szybko nazwac na glos.
+ * Paleta bodzcow: szesc barw rozlozonych po kole barw plus biel i czern.
+ *
+ * Kolory sa dobrane tak, by dalo sie je rozroznic jednym spojrzeniem i szybko nazwac na glos -
+ * stad brak dwoch odcieni tej samej barwy (np. czerwieni i rozu, ktore przy krotkiej ekspozycji
+ * latwo pomylic).
  *
  * [argb] trzymamy jako [Long], a nie jako `androidx.compose.ui.graphics.Color`, zeby model
  * pozostal niezalezny od warstwy UI (i dzialal w testach jednostkowych na czystej JVM).
+ * Nazwy widoczne dla uzytkownika mieszkaja w zasobach - patrz `ui/Labels.kt`.
  */
 enum class StimulusColor(
     val id: String,
-    val displayName: String,
     val argb: Long,
 ) {
-    RED("red", "Czerwony", 0xFFE53935),
-    ORANGE("orange", "Pomarańczowy", 0xFFFB8C00),
-    YELLOW("yellow", "Żółty", 0xFFFDD835),
-    GREEN("green", "Zielony", 0xFF43A047),
-    TEAL("teal", "Turkusowy", 0xFF00ACC1),
-    BLUE("blue", "Niebieski", 0xFF1E88E5),
-    PURPLE("purple", "Fioletowy", 0xFF8E24AA),
-    PINK("pink", "Różowy", 0xFFD81B60),
+    RED("red", 0xFFE53935),
+    ORANGE("orange", 0xFFFB8C00),
+    YELLOW("yellow", 0xFFFDD835),
+    GREEN("green", 0xFF43A047),
+    BLUE("blue", 0xFF1E88E5),
+    PURPLE("purple", 0xFF8E24AA),
+    WHITE("white", 0xFFFFFFFF),
+    BLACK("black", 0xFF000000),
     ;
 
     /**
      * Kolor cyfry na tym tle: barwa z przeciwnej strony kola barw (negatyw barwny).
+     * Dla bieli i czerni, ktore wlasnej barwy nie maja, negatywem jest druga skrajnosc jasnosci.
+     *
      * Liczony raz, przy inicjalizacji enuma - w trakcie sesji odczytywany co klatke.
      */
     val contentArgb: Long = Contrast.complementary(argb)
@@ -34,6 +39,12 @@ enum class StimulusColor(
      * dopelniajaca ma jasnosc zblizona do tla (np. niebieski i pomaranczowy).
      */
     val outlineArgb: Long = Contrast.bestContentColor(argb)
+
+    /**
+     * Czy obrys ma sens. Na bieli i czerni cyfra jest juz w kolorze obrysu, wiec rysowanie
+     * go tylko pogrubialoby znak.
+     */
+    val hasOutline: Boolean = contentArgb != outlineArgb
 
     companion object {
         val ALL: List<StimulusColor> = entries

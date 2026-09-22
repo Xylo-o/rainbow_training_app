@@ -2,9 +2,9 @@ package com.rainbow.training.ui
 
 import java.util.Locale
 
-/** "0,5 s", "2,4 s" - sekundy z jednym miejscem po przecinku, po polsku. */
+/** "0.5 s", "2.4 s" - sekundy z jednym miejscem po kropce dziesietnej. */
 fun formatSeconds(millis: Long): String =
-    String.format(Locale.forLanguageTag("pl-PL"), "%.1f s", millis / 1000.0)
+    String.format(Locale.US, "%.1f s", millis / 1000.0)
 
 /** "45 s", "2 min", "2 min 30 s" - zwiezly opis dlugosci sesji. */
 fun formatDuration(millis: Long): String {

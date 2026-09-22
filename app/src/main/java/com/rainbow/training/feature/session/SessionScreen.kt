@@ -36,18 +36,26 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.rainbow.training.R
 import com.rainbow.training.core.model.Stimulus
 import com.rainbow.training.feature.SessionPhase
 import com.rainbow.training.feature.monotonicNowMillis
 import com.rainbow.training.ui.backgroundColor
 import com.rainbow.training.ui.contentColor
 import com.rainbow.training.ui.outlineColor
-import com.rainbow.training.ui.theme.InterFontFamily
+import com.rainbow.training.ui.theme.DigitFamily
 
 /** Grubosc obrysu cyfry jako ulamek jej wysokosci. */
 private const val OUTLINE_WIDTH_RATIO = 0.05f
+
+/** Wysokosc cyfry-bodzca jako ulamek krotszego boku ekranu. */
+private const val DIGIT_HEIGHT_FRACTION = 0.62f
+
+/** Odliczanie 3-2-1 jest mniejsze od bodzcow - to tylko zapowiedz, nie cwiczenie. */
+private const val COUNTDOWN_HEIGHT_FRACTION = 0.35f
 
 /**
  * Pelnoekranowy ekran treningu.
@@ -88,10 +96,10 @@ private fun CountdownContent(secondsLeft: Int, modifier: Modifier = Modifier) {
                 color = MaterialTheme.colorScheme.onBackground,
                 // Na jednolitym ciemnym tle obrys nie jest potrzebny - kontrast jest maksymalny.
                 outline = null,
-                heightFraction = 0.35f,
+                heightFraction = COUNTDOWN_HEIGHT_FRACTION,
             )
             Text(
-                text = "Przygotuj się",
+                text = stringResource(R.string.session_get_ready),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -114,8 +122,10 @@ private fun RunningContent(phase: SessionPhase.Running, modifier: Modifier = Mod
             GiantGlyph(
                 text = stimulus.digit.toString(),
                 color = stimulus.contentColor,
-                outline = stimulus.outlineColor,
-                heightFraction = 0.55f,
+                // Na bieli i czerni cyfra ma juz kolor obrysu - dorysowanie go tylko
+                // pogrubiloby znak, wiec go pomijamy.
+                outline = stimulus.outlineColor.takeIf { stimulus.color.hasOutline },
+                heightFraction = DIGIT_HEIGHT_FRACTION,
             )
         }
 
@@ -150,7 +160,7 @@ private fun GiantGlyph(
         val outlineWidthPx = with(density) { glyphHeight.toPx() } * OUTLINE_WIDTH_RATIO
 
         val style = TextStyle(
-            fontFamily = InterFontFamily,
+            fontFamily = DigitFamily,
             fontWeight = FontWeight.ExtraBold,
             fontSize = fontSize,
             textAlign = TextAlign.Center,

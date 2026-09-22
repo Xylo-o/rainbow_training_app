@@ -1,4 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Rainbow Trening</string>
+    <string name="app_name">Rainbow Training</string>
+
+    <!-- Setup screen -->
+    <string name="setup_title">Observation Training</string>
+    <string name="setup_subtitle">Stimuli appear at random intervals. React however you like — you never need to touch the screen.</string>
+    <string name="setup_start">START</string>
+
+    <string name="section_mode">Mode</string>
+    <string name="section_colors">Colours</string>
+    <string name="section_colors_hint">Stimuli are drawn only from the selected colours (at least %1$d).</string>
+    <string name="section_digits">Digits</string>
+    <string name="section_digits_hint">The digit appears on a coloured background, in the opposite colour.</string>
+    <string name="section_interval">Interval between stimuli</string>
+    <string name="section_interval_hint">Every change waits a random amount of time somewhere in this range.</string>
+    <string name="section_interval_value">from %1$s to %2$s</string>
+    <string name="section_duration">Session length</string>
+    <string name="section_duration_hint">Pick a preset or type your own.</string>
+    <string name="duration_minutes">min</string>
+    <string name="duration_seconds">s</string>
+    <string name="duration_total">= %1$s</string>
+
+    <!-- Modes -->
+    <string name="mode_colors">Colours</string>
+    <string name="mode_colors_description">The whole screen fills with one colour from the palette.</string>
+    <string name="mode_digits">Digits</string>
+    <string name="mode_digits_description">A large digit on a coloured background, in the most contrasting colour.</string>
+    <string name="mode_mixed">Mixed</string>
+    <string name="mode_mixed_description">Randomly interleaved: sometimes a plain colour, sometimes a colour with a digit.</string>
+
+    <!-- Palette -->
+    <string name="color_red">Red</string>
+    <string name="color_orange">Orange</string>
+    <string name="color_yellow">Yellow</string>
+    <string name="color_green">Green</string>
+    <string name="color_blue">Blue</string>
+    <string name="color_purple">Purple</string>
+    <string name="color_white">White</string>
+    <string name="color_black">Black</string>
+    <string name="color_state_on">on</string>
+    <string name="color_state_off">off</string>
+
+    <!-- Validation -->
+    <string name="error_too_few_colors">Select at least %1$d colours.</string>
+    <string name="error_too_few_digits">Select at least %1$d digits.</string>
+    <string name="error_interval_too_short">The shortest interval is %1$s.</string>
+    <string name="error_interval_too_long">The longest interval is %1$s.</string>
+    <string name="error_interval_reversed">The lower bound cannot be greater than the upper one.</string>
+    <string name="error_session_too_short">A session must last at least %1$s.</string>
+    <string name="error_session_too_long">A session can last at most %1$s.</string>
+
+    <!-- Session -->
+    <string name="session_get_ready">Get ready</string>
+
+    <!-- Summary -->
+    <string name="summary_title">Session complete</string>
+    <string name="summary_heading">Summary</string>
+    <string name="summary_duration">Duration</string>
+    <string name="summary_count">Stimuli shown</string>
+    <string name="summary_average">Average interval</string>
+    <string name="summary_repeat">Repeat</string>
+    <string name="summary_change_settings">Change settings</string>
 </resources>

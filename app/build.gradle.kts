@@ -5,11 +5,14 @@ plugins {
 }
 
 android {
+    // namespace to pakiet klasy R i kodu Kotlina - sprawa wewnętrzna, Play go nie widzi.
     namespace = "com.rainbow.training"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.rainbow.training"
+        // Czytane z gradle.properties, żeby podmiana na własną domenę była zmianą w jednym
+        // miejscu. Szczegóły i ostrzeżenie o nieodwracalności - tam.
+        applicationId = providers.gradleProperty("rainbow.applicationId").get()
         minSdk = 24
         targetSdk = 35
         versionCode = 1

@@ -1,12 +1,16 @@
 package com.rainbow.training.core.model
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import kotlin.math.abs
 
 class ContrastTest {
+
+    /** Kolory majace wlasna barwe - biel i czern rzadza sie osobnymi regulami. */
+    private val chromatic = StimulusColor.ALL - setOf(StimulusColor.WHITE, StimulusColor.BLACK)
 
     @Test
     fun `czern na bieli daje maksymalny kontrast 21`() {
@@ -21,21 +25,36 @@ class ContrastTest {
     }
 
     @Test
-    fun `cyfra dostaje barwe, a nie czern czy biel`() {
-        StimulusColor.ALL.forEach { color ->
-            assertNotEquals(color.displayName, Contrast.WHITE, color.contentArgb)
-            assertNotEquals(color.displayName, Contrast.BLACK, color.contentArgb)
+    fun `barwne tlo dostaje cyfre w kolorze, a nie w czerni czy bieli`() {
+        chromatic.forEach { color ->
+            assertNotEquals(color.id, Contrast.WHITE, color.contentArgb)
+            assertNotEquals(color.id, Contrast.BLACK, color.contentArgb)
         }
     }
 
     @Test
     fun `barwa cyfry lezy po przeciwnej stronie kola barw`() {
-        StimulusColor.ALL.forEach { color ->
+        chromatic.forEach { color ->
             val distance = hueDistance(Contrast.hue(color.argb), Contrast.hue(color.contentArgb))
             assertTrue(
-                "${color.displayName}: barwy dzieli $distance stopni zamiast ~180",
+                "${color.id}: barwy dzieli $distance stopni zamiast ~180",
                 distance >= 165.0,
             )
+        }
+    }
+
+    @Test
+    fun `biel i czern dostaja swoje przeciwienstwo jasnosciowe`() {
+        assertEquals(Contrast.BLACK, StimulusColor.WHITE.contentArgb)
+        assertEquals(Contrast.WHITE, StimulusColor.BLACK.contentArgb)
+    }
+
+    @Test
+    fun `na bieli i czerni obrys jest zbedny, na barwach konieczny`() {
+        assertFalse(StimulusColor.WHITE.hasOutline)
+        assertFalse(StimulusColor.BLACK.hasOutline)
+        chromatic.forEach { color ->
+            assertTrue("${color.id} powinien miec obrys", color.hasOutline)
         }
     }
 
@@ -44,7 +63,7 @@ class ContrastTest {
         StimulusColor.ALL.forEach { color ->
             val ratio = Contrast.ratio(color.argb, color.contentArgb)
             assertTrue(
-                "${color.displayName} ma kontrast cyfry tylko $ratio",
+                "${color.id} ma kontrast cyfry tylko $ratio",
                 ratio >= Contrast.MIN_DIGIT_RATIO,
             )
         }
@@ -54,26 +73,25 @@ class ContrastTest {
     fun `obrys to czern albo biel i mocno odcina cyfre od tla`() {
         StimulusColor.ALL.forEach { color ->
             assertTrue(
-                "${color.displayName}: obrys nie jest czernia ani biela",
+                "${color.id}: obrys nie jest czernia ani biela",
                 color.outlineArgb == Contrast.WHITE || color.outlineArgb == Contrast.BLACK,
             )
             val ratio = Contrast.ratio(color.argb, color.outlineArgb)
-            assertTrue("${color.displayName}: obrys ma kontrast tylko $ratio", ratio >= 4.5)
+            assertTrue("${color.id}: obrys ma kontrast tylko $ratio", ratio >= 4.5)
         }
     }
 
     @Test
-    fun `nienasycone tlo i tak dostaje nasycona cyfre`() {
-        // Szarosc nie ma wlasnej barwy - dopelnienie musi i tak byc kolorowe, nie kolejna szaroscia.
+    fun `szare tlo dostaje cyfre o maksymalnym kontrascie`() {
+        // Szarosc nie ma barwy, wiec nie ma tez sensownego dopelnienia - liczy sie czysty kontrast.
         val digit = Contrast.complementary(0xFF808080)
-        val (_, saturation, _) = Contrast.toHsl(digit)
-        assertTrue("Cyfra na szarym tle ma nasycenie tylko $saturation", saturation >= 0.8)
+        assertTrue(digit == Contrast.WHITE || digit == Contrast.BLACK)
     }
 
     @Test
     fun `konwersja przez HSL i z powrotem zachowuje kolor`() {
         val samples = listOf(
-            0xFFE53935, 0xFF1E88E5, 0xFF00ACC1, 0xFFFDD835,
+            0xFFE53935, 0xFF1E88E5, 0xFFFDD835, 0xFF43A047,
             0xFF808080, 0xFF000000, 0xFFFFFFFF,
         )
         samples.forEach { argb ->

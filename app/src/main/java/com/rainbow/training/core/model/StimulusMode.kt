@@ -1,26 +1,13 @@
 package com.rainbow.training.core.model
 
-/** Tryb treningu - decyduje, jakie bodzce pojawiaja sie na ekranie. */
-enum class StimulusMode(
-    val id: String,
-    val displayName: String,
-    val description: String,
-) {
-    COLORS(
-        id = "colors",
-        displayName = "Kolory",
-        description = "Cały ekran wypełnia jeden kolor z palety.",
-    ),
-    DIGITS(
-        id = "digits",
-        displayName = "Cyfry",
-        description = "Duża cyfra na kolorowym tle, w maksymalnie kontrastowym kolorze.",
-    ),
-    MIXED(
-        id = "mixed",
-        displayName = "Mieszany",
-        description = "Losowo przeplatane: raz sam kolor, raz kolor z cyfrą.",
-    ),
+/**
+ * Tryb treningu - decyduje, jakie bodzce pojawiaja sie na ekranie.
+ * Nazwy i opisy widoczne dla uzytkownika mieszkaja w zasobach - patrz `ui/Labels.kt`.
+ */
+enum class StimulusMode(val id: String) {
+    COLORS("colors"),
+    DIGITS("digits"),
+    MIXED("mixed"),
     ;
 
     /** Czy ten tryb moze wyswietlic cyfre (a wiec czy wybor cyfr ma znaczenie). */

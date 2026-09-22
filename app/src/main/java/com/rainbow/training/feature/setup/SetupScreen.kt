@@ -8,7 +8,8 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -35,17 +36,23 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.rainbow.training.R
 import com.rainbow.training.core.model.StimulusColor
 import com.rainbow.training.core.model.StimulusMode
 import com.rainbow.training.core.model.TrainingSettings
-import com.rainbow.training.monetization.AdBannerSlot
+import com.rainbow.training.monetization.LocalAdHost
 import com.rainbow.training.ui.components.ColorToggle
 import com.rainbow.training.ui.components.SectionCard
+import com.rainbow.training.ui.description
 import com.rainbow.training.ui.formatDuration
 import com.rainbow.training.ui.formatSeconds
+import com.rainbow.training.ui.label
+import com.rainbow.training.ui.message
 import kotlin.math.roundToLong
 
 /** Ekran konfiguracji sesji - wszystko, co trzeba ustawic przed wcisnieciem START. */
@@ -65,12 +72,16 @@ fun SetupScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                        // Odsuwa START od paska nawigacji telefonu (gestow albo trzech przyciskow),
+                        // zeby nie dalo sie trafic w niego przypadkiem zamiast w przycisk systemowy.
+                        .navigationBarsPadding()
+                        .padding(horizontal = 16.dp)
+                        .padding(top = 12.dp, bottom = 20.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     if (error != null) {
                         Text(
-                            text = error,
+                            text = error.message(),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.error,
                         )
@@ -80,11 +91,16 @@ fun SetupScreen(
                         enabled = error == null,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(56.dp),
+                            .heightIn(min = 60.dp),
                     ) {
-                        Text(text = "START", style = MaterialTheme.typography.titleMedium)
+                        Text(
+                            text = stringResource(R.string.setup_start),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = 2.sp,
+                        )
                     }
-                    AdBannerSlot()
+                    LocalAdHost.current.Banner(Modifier)
                 }
             }
         },
@@ -101,13 +117,12 @@ fun SetupScreen(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 Text(
-                    text = "Trening obserwacji",
+                    text = stringResource(R.string.setup_title),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                 )
                 Text(
-                    text = "Aplikacja pokazuje bodźce w losowych odstępach. " +
-                        "Reaguj na nie po swojemu — ekranu nie trzeba dotykać.",
+                    text = stringResource(R.string.setup_subtitle),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -160,7 +175,7 @@ fun SetupScreen(
 
 @Composable
 private fun ModeSection(mode: StimulusMode, onModeChange: (StimulusMode) -> Unit) {
-    SectionCard(title = "Tryb") {
+    SectionCard(title = stringResource(R.string.section_mode)) {
         val modes = StimulusMode.entries
         SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
             modes.forEachIndexed { index, item ->
@@ -168,12 +183,12 @@ private fun ModeSection(mode: StimulusMode, onModeChange: (StimulusMode) -> Unit
                     selected = item == mode,
                     onClick = { onModeChange(item) },
                     shape = SegmentedButtonDefaults.itemShape(index = index, count = modes.size),
-                    label = { Text(item.displayName) },
+                    label = { Text(item.label()) },
                 )
             }
         }
         Text(
-            text = mode.description,
+            text = mode.description(),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -186,9 +201,11 @@ private fun ColorsSection(
     onToggle: (StimulusColor) -> Unit,
 ) {
     SectionCard(
-        title = "Kolory",
-        subtitle = "Bodźce losowane są tylko z zaznaczonych barw (minimum " +
-            "${TrainingSettings.MIN_ENABLED_COLORS}).",
+        title = stringResource(R.string.section_colors),
+        subtitle = stringResource(
+            R.string.section_colors_hint,
+            TrainingSettings.MIN_ENABLED_COLORS,
+        ),
     ) {
         FlowRow(
             modifier = Modifier.fillMaxWidth(),
@@ -209,8 +226,8 @@ private fun ColorsSection(
 @Composable
 private fun DigitsSection(enabled: Set<Int>, onToggle: (Int) -> Unit) {
     SectionCard(
-        title = "Cyfry",
-        subtitle = "Cyfra pojawia się na kolorowym tle, w maksymalnie kontrastowym kolorze.",
+        title = stringResource(R.string.section_digits),
+        subtitle = stringResource(R.string.section_digits_hint),
     ) {
         FlowRow(
             modifier = Modifier.fillMaxWidth(),
@@ -240,11 +257,15 @@ private fun IntervalSection(
     val steps = ((upperBound - lowerBound) * 10f).roundToLong().toInt() - 1
 
     SectionCard(
-        title = "Odstęp między bodźcami",
-        subtitle = "Każda zmiana czeka losowo długo — gdzieś w tym zakresie.",
+        title = stringResource(R.string.section_interval),
+        subtitle = stringResource(R.string.section_interval_hint),
     ) {
         Text(
-            text = "od ${formatSeconds(minMillis)} do ${formatSeconds(maxMillis)}",
+            text = stringResource(
+                R.string.section_interval_value,
+                formatSeconds(minMillis),
+                formatSeconds(maxMillis),
+            ),
             style = MaterialTheme.typography.titleLarge,
         )
         RangeSlider(
@@ -264,8 +285,8 @@ private fun IntervalSection(
 @Composable
 private fun DurationSection(durationMillis: Long, onChange: (Long) -> Unit) {
     SectionCard(
-        title = "Długość sesji",
-        subtitle = "Wybierz gotową długość albo wpisz własną.",
+        title = stringResource(R.string.section_duration),
+        subtitle = stringResource(R.string.section_duration_hint),
     ) {
         FlowRow(
             modifier = Modifier.fillMaxWidth(),
@@ -322,10 +343,10 @@ private fun CustomDurationFields(durationMillis: Long, onChange: (Long) -> Unit)
                 minutesText = input.filter(Char::isDigit).take(3)
                 publish(minutesText, secondsText)
             },
-            label = { Text("min") },
+            label = { Text(stringResource(R.string.duration_minutes)) },
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier.width(110.dp),
+            modifier = Modifier.width(104.dp),
         )
         OutlinedTextField(
             value = secondsText,
@@ -333,13 +354,13 @@ private fun CustomDurationFields(durationMillis: Long, onChange: (Long) -> Unit)
                 secondsText = input.filter(Char::isDigit).take(2)
                 publish(minutesText, secondsText)
             },
-            label = { Text("s") },
+            label = { Text(stringResource(R.string.duration_seconds)) },
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier.width(110.dp),
+            modifier = Modifier.width(104.dp),
         )
         Text(
-            text = "= ${formatDuration(durationMillis)}",
+            text = stringResource(R.string.duration_total, formatDuration(durationMillis)),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

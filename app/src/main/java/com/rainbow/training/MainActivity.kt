@@ -17,7 +17,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.CompositionLocalProvider
 import com.rainbow.training.core.platform.Haptics
+import com.rainbow.training.monetization.AdHost
+import com.rainbow.training.monetization.LocalAdHost
 import com.rainbow.training.feature.SessionPhase
 import com.rainbow.training.feature.TrainingEvent
 import com.rainbow.training.feature.TrainingViewModel
@@ -46,9 +49,12 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background,
                 ) {
-                    RainbowTrainingApp(
-                        viewModel = viewModel(factory = TrainingViewModel.factory(container)),
-                    )
+                    CompositionLocalProvider(LocalAdHost provides container.adHost) {
+                        RainbowTrainingApp(
+                            viewModel = viewModel(factory = TrainingViewModel.factory(container)),
+                            adHost = container.adHost,
+                        )
+                    }
                 }
             }
         }
@@ -57,7 +63,7 @@ class MainActivity : ComponentActivity() {
 
 /** Korzen aplikacji: wybiera ekran na podstawie fazy sesji i obsluguje zdarzenia jednorazowe. */
 @Composable
-fun RainbowTrainingApp(viewModel: TrainingViewModel) {
+fun RainbowTrainingApp(viewModel: TrainingViewModel, adHost: AdHost) {
     val phase by viewModel.phase.collectAsStateWithLifecycle()
     val settings by viewModel.settings.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -65,7 +71,12 @@ fun RainbowTrainingApp(viewModel: TrainingViewModel) {
     LaunchedEffect(viewModel) {
         viewModel.events.collect { event ->
             when (event) {
-                TrainingEvent.SessionFinished -> Haptics.sessionFinished(context)
+                TrainingEvent.SessionFinished -> {
+                    Haptics.sessionFinished(context)
+                    // Jedyne miejsce, w ktorym moze pasc pelnoekranowa reklama: miedzy
+                    // sesjami, nigdy w trakcie treningu.
+                    adHost.onSessionCompleted()
+                }
             }
         }
     }
