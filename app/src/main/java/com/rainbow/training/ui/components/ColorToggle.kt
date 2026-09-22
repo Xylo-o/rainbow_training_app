@@ -26,7 +26,10 @@ import com.rainbow.training.ui.composeColor
 
 /**
  * Kafelek jednego koloru z palety. Zaznaczony swieci pelna barwa i nosi znacznik w kolorze
- * maksymalnie kontrastowym - tym samym, ktorym beda rysowane cyfry na tym tle.
+ * maksymalnie kontrastowym - tym samym, ktorym obrysowywane sa cyfry na tym tle.
+ *
+ * Znacznik celowo NIE uzywa barwy dopelniajacej (tej od cyfr): to cienka kreska na malym
+ * kafelku, wiec liczy sie tu czysty kontrast, a nie barwa.
  */
 @Composable
 fun ColorToggle(
@@ -66,7 +69,7 @@ fun ColorToggle(
             Icon(
                 imageVector = Icons.Default.Check,
                 contentDescription = null,
-                tint = Color(color.contentArgb),
+                tint = Color(color.outlineArgb),
             )
         }
     }

@@ -11,7 +11,11 @@ sealed interface Stimulus {
 
     val backgroundArgb: Long get() = color.argb
 
+    /** Kolor cyfry - barwa dopelniajaca do tla. */
     val contentArgb: Long get() = color.contentArgb
+
+    /** Obrys cyfry, ktory wycina jej ksztalt z tla. */
+    val outlineArgb: Long get() = color.outlineArgb
 
     /** Samo kolorowe tlo. */
     data class ColorOnly(override val color: StimulusColor) : Stimulus

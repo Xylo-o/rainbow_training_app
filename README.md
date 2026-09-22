@@ -40,11 +40,37 @@ Osiem barw rozłożonych równomiernie po kole barw; każdą można wyłączyć 
 | 🟣 | Fioletowy | `#8E24AA` |
 | 🩷 | Różowy | `#D81B60` |
 
-Kolor cyfry nie jest ustalony na sztywno — liczy go `Contrast.bestContentColor()` na podstawie
-luminancji tła według WCAG 2.1. Na jasnych tłach (żółty, pomarańczowy, turkusowy) cyfra jest
-czarna, na ciemnych biała. Dzięki temu po dodaniu nowego koloru do palety nic nie trzeba
-dostrajać ręcznie, a każdy kombinacja ma kontrast powyżej progu WCAG AA dla dużego tekstu
-(pilnuje tego test `ContrastTest`).
+### Kolor cyfry: negatyw barwny
+
+Cyfra dostaje **barwę z przeciwnej strony koła barw** niż tło — nie czerń ani biel. Liczy to
+`Contrast.complementary()`: bierze odcień tła, obraca o 180°, wymusza nasycenie i dobiera
+jasność tak, żeby zachować jak najwięcej koloru przy kontraście co najmniej 3,0 (próg WCAG AA
+dla dużego tekstu — a cyfra zajmuje ponad połowę wysokości ekranu).
+
+| Tło | Cyfra | Kontrast |
+| --- | --- | --- |
+| Czerwony `#E53935` | cyjan `#5AEEF2` | 3,0 |
+| Pomarańczowy `#FB8C00` | niebieski `#004FB2` | 3,2 |
+| Żółty `#FDD835` | niebieski `#0231FC` | 5,3 |
+| Zielony `#43A047` | purpura `#760A71` | 3,1 |
+| Turkusowy `#00ACC1` | czerwony `#991100` | 3,2 |
+| Niebieski `#1E88E5` | brąz `#5E3008` | 3,0 |
+| Fioletowy `#8E24AA` | zieleń `#40EC13` | 4,4 |
+| Różowy `#D81B60` | mięta `#13EC9D` | 3,2 |
+
+Do tego dochodzi **obrys** — czarny lub biały, zależnie od tego, co mocniej odcina się od tła
+(kontrast obrysu do tła: 4,9–15,1). To on daje ostrą krawędź znaku i ratuje czytelność tam,
+gdzie barwa dopełniająca ma jasność zbliżoną do tła, jak przy parze niebieski/pomarańczowy.
+
+Nic z tego nie jest wpisane na sztywno: po dodaniu nowego koloru do palety obie wartości
+wyliczą się same, a testy w `ContrastTest` pilnują progów.
+
+### Czcionka
+
+Cyfry i cały interfejs używają kroju **Inter** (400 / 600 / 800), wbudowanego w aplikację
+(`app/src/main/res/font/`) — bez Google Fonts Provider, więc aplikacja działa w pełni offline
+i nie potrzebuje uprawnienia do sieci. Cyfry rysowane są wagą ExtraBold. Szczegóły licencyjne:
+`third_party/Inter/README.md`.
 
 ### Losowość
 

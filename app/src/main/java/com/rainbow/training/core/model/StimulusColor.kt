@@ -22,8 +22,18 @@ enum class StimulusColor(
     PINK("pink", "Różowy", 0xFFD81B60),
     ;
 
-    /** Kolor cyfry na tym tle - maksymalny kontrast ("negatyw" jasnosciowy). */
-    val contentArgb: Long get() = Contrast.bestContentColor(argb)
+    /**
+     * Kolor cyfry na tym tle: barwa z przeciwnej strony kola barw (negatyw barwny).
+     * Liczony raz, przy inicjalizacji enuma - w trakcie sesji odczytywany co klatke.
+     */
+    val contentArgb: Long = Contrast.complementary(argb)
+
+    /**
+     * Obrys cyfry - czern albo biel, zaleznie od tego, co mocniej odcina sie od tla.
+     * To on odpowiada za ostra krawedz znaku i ratuje czytelnosc tam, gdzie barwa
+     * dopelniajaca ma jasnosc zblizona do tla (np. niebieski i pomaranczowy).
+     */
+    val outlineArgb: Long = Contrast.bestContentColor(argb)
 
     companion object {
         val ALL: List<StimulusColor> = entries

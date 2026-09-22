@@ -33,6 +33,7 @@ private val RainbowDarkColors = darkColorScheme(
 fun RainbowTrainingTheme(content: @Composable () -> Unit) {
     MaterialTheme(
         colorScheme = RainbowDarkColors,
+        typography = RainbowTypography,
         content = content,
     )
 }

@@ -13,3 +13,5 @@ val StimulusColor.composeColor: Color get() = Color(argb)
 val Stimulus.backgroundColor: Color get() = Color(backgroundArgb)
 
 val Stimulus.contentColor: Color get() = Color(contentArgb)
+
+val Stimulus.outlineColor: Color get() = Color(outlineArgb)

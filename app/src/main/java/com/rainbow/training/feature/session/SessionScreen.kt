@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalTextApi::class)
+
 package com.rainbow.training.feature.session
 
 import androidx.activity.compose.BackHandler
@@ -27,7 +29,12 @@ import androidx.compose.runtime.withFrameMillis
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -36,6 +43,11 @@ import com.rainbow.training.feature.SessionPhase
 import com.rainbow.training.feature.monotonicNowMillis
 import com.rainbow.training.ui.backgroundColor
 import com.rainbow.training.ui.contentColor
+import com.rainbow.training.ui.outlineColor
+import com.rainbow.training.ui.theme.InterFontFamily
+
+/** Grubosc obrysu cyfry jako ulamek jej wysokosci. */
+private const val OUTLINE_WIDTH_RATIO = 0.05f
 
 /**
  * Pelnoekranowy ekran treningu.
@@ -74,6 +86,8 @@ private fun CountdownContent(secondsLeft: Int, modifier: Modifier = Modifier) {
             GiantGlyph(
                 text = secondsLeft.toString(),
                 color = MaterialTheme.colorScheme.onBackground,
+                // Na jednolitym ciemnym tle obrys nie jest potrzebny - kontrast jest maksymalny.
+                outline = null,
                 heightFraction = 0.35f,
             )
             Text(
@@ -89,7 +103,6 @@ private fun CountdownContent(secondsLeft: Int, modifier: Modifier = Modifier) {
 private fun RunningContent(phase: SessionPhase.Running, modifier: Modifier = Modifier) {
     val stimulus = phase.stimulus
     val background = stimulus.backgroundColor
-    val content = stimulus.contentColor
 
     Box(
         modifier = modifier
@@ -100,7 +113,8 @@ private fun RunningContent(phase: SessionPhase.Running, modifier: Modifier = Mod
         if (stimulus is Stimulus.Digit) {
             GiantGlyph(
                 text = stimulus.digit.toString(),
-                color = content,
+                color = stimulus.contentColor,
+                outline = stimulus.outlineColor,
                 heightFraction = 0.55f,
             )
         }
@@ -108,30 +122,54 @@ private fun RunningContent(phase: SessionPhase.Running, modifier: Modifier = Mod
         SessionProgressBar(
             startedAtMillis = phase.startedAtMillis,
             totalMillis = phase.totalMillis,
-            color = content,
+            color = stimulus.outlineColor,
             modifier = Modifier.align(Alignment.TopCenter),
         )
     }
 }
 
-/** Jak najwiekszy znak, ktory zmiesci sie na ekranie niezaleznie od rozmiaru urzadzenia. */
+/**
+ * Jak najwiekszy znak, ktory zmiesci sie na ekranie niezaleznie od rozmiaru urzadzenia.
+ *
+ * Rysowany dwa razy: najpierw sam obrys, potem wypelnienie na wierzchu. Obrys wystaje poza
+ * ksztalt znaku o polowe swojej grubosci i to on daje ostra krawedz, dzieki ktorej cyfra
+ * czyta sie natychmiast nawet wtedy, gdy jej barwa dopelniajaca ma jasnosc podobna do tla.
+ */
 @Composable
 private fun GiantGlyph(
     text: String,
     color: Color,
+    outline: Color?,
     heightFraction: Float,
     modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(modifier = modifier, contentAlignment = Alignment.Center) {
-        val shorterSide = minOf(maxWidth, maxHeight)
-        val fontSize = with(LocalDensity.current) { (shorterSide * heightFraction).toSp() }
-        Text(
-            text = text,
-            color = color,
+        val glyphHeight = minOf(maxWidth, maxHeight) * heightFraction
+        val density = LocalDensity.current
+        val fontSize = with(density) { glyphHeight.toSp() }
+        val outlineWidthPx = with(density) { glyphHeight.toPx() } * OUTLINE_WIDTH_RATIO
+
+        val style = TextStyle(
+            fontFamily = InterFontFamily,
+            fontWeight = FontWeight.ExtraBold,
             fontSize = fontSize,
-            fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
         )
+
+        if (outline != null) {
+            Text(
+                text = text,
+                color = outline,
+                style = style.copy(
+                    drawStyle = Stroke(
+                        width = outlineWidthPx,
+                        join = StrokeJoin.Round,
+                        cap = StrokeCap.Round,
+                    ),
+                ),
+            )
+        }
+        Text(text = text, color = color, style = style)
     }
 }
 
