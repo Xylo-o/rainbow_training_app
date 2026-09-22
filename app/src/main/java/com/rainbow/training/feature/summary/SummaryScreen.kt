@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.rainbow.training.monetization.AdBannerSlot
 import com.rainbow.training.ui.components.SectionCard
 import com.rainbow.training.ui.formatDuration
+import com.rainbow.training.ui.formatSeconds
 
 /** Ekran po zakonczonej sesji: krotkie podsumowanie i dwa wyjscia. */
 @Composable
@@ -55,7 +56,7 @@ fun SummaryScreen(
             if (stimulusCount > 0) {
                 SummaryRow(
                     label = "Średni odstęp",
-                    value = "${(durationMillis / stimulusCount) / 1000.0} s".replace('.', ','),
+                    value = formatSeconds(durationMillis / stimulusCount),
                 )
             }
         }

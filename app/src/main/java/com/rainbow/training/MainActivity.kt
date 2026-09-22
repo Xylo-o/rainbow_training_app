@@ -1,7 +1,9 @@
 package com.rainbow.training
 
+import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
@@ -28,7 +30,13 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        // Motyw aplikacji jest zawsze ciemny, wiec ikony paskow systemowych tez musza byc
+        // jasne - domyslne `auto` wybiera je wedlug motywu SYSTEMU i na telefonie ustawionym
+        // na jasny znikaja na ciemnym tle.
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
+            navigationBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
+        )
 
         val container = (application as RainbowApp).container
 
