@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tlo okna zanim Compose zdazy narysowac pierwsza klatke - zgodne z motywem aplikacji. -->
+    <color name="window_background">#FF0E0F13</color>
+    <color name="ic_launcher_background">#FF12141A</color>
+</resources>
