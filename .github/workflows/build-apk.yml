@@ -29,8 +29,17 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      # `packages: ''` jest istotne: domyslna lista akcji zawiera pakiet `tools`,
+      # ktorego nie ma juz w repozytorium Android SDK, przez co krok sie wywraca.
       - name: Ustaw Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: ''
+
+      - name: Doinstaluj platforme i build-tools
+        run: |
+          yes | sdkmanager --licenses > /dev/null 2>&1 || true
+          sdkmanager --install "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
       - name: Ustaw Gradle
         uses: gradle/actions/setup-gradle@v4
