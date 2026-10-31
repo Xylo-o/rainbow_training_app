@@ -1,4 +1,4 @@
-# Rainbow Trening
+# Rainbow Training
 
 Natywna aplikacja na Androida (Kotlin + Jetpack Compose) do treningu obserwacji i refleksu
 wzrokowego. Pokazuje na pełnym ekranie pojedyncze bodźce — kolory i cyfry — zmieniające się
@@ -7,22 +7,24 @@ w losowych odstępach czasu.
 Aplikacja **tylko wyświetla bodźce**. Nie mierzy czasu reakcji i nie wymaga dotykania ekranu
 w trakcie sesji — reakcja (głosem, ruchem, czymkolwiek) dzieje się poza aplikacją.
 
+Interfejs jest po angielsku; nazwy przycisków i trybów poniżej podane są tak, jak w aplikacji.
+
 ## Jak działa
 
 1. **Ekran ustawień** — tryb, paleta, zakres odstępów, długość sesji.
 2. **Odliczanie 3 · 2 · 1** — czas na odłożenie telefonu i przygotowanie się.
 3. **Sesja** — pełny ekran, ukryte paski systemowe, ekran nie gaśnie. U góry cienki pasek
    postępu. Wyjście w trakcie: przycisk / gest „wstecz”.
-4. **Podsumowanie** — czas, liczba bodźców, średni odstęp; przyciski „Powtórz” i
-   „Zmień ustawienia”. Koniec sesji sygnalizuje krótka wibracja.
+4. **Podsumowanie** — czas, liczba bodźców, średni odstęp; przyciski **Repeat** i
+   **Change settings**. Koniec sesji sygnalizuje krótka wibracja, a „wstecz” wraca do ustawień.
 
 ### Tryby
 
 | Tryb | Co widać |
 | --- | --- |
-| **Kolory** | Cały ekran w jednym kolorze z palety. |
-| **Cyfry** | Duża cyfra na kolorowym tle, w kolorze o maksymalnym kontraście. |
-| **Mieszany** | Losowo przeplatane: raz sam kolor, raz kolor z cyfrą. |
+| **Colours** | Cały ekran w jednym kolorze z palety. |
+| **Digits** | Duża cyfra na kolorowym tle, w barwie dopełniającej (patrz niżej). |
+| **Mixed** | Losowo przeplatane: raz sam kolor, raz kolor z cyfrą. |
 
 ### Paleta
 
@@ -163,3 +165,17 @@ Aplikacja nie ma reklam ani kont — celowo. Miejsca na jedno i drugie są już 
   Wystarczy dostarczyć inną implementację w `AppContainer`.
 - **Synchronizacja ustawień** — `SettingsRepository` jest interfejsem, więc implementację
   lokalną można zastąpić lub obudować wersją sieciową bez zmian w UI.
+
+## Licencja
+
+Kod źródłowy jest **własnościowy — wszystkie prawa zastrzeżone** (© 2026 Xylo-o, pełna treść
+w [`LICENSE`](LICENSE)). Kopiowanie, modyfikowanie, publikowanie i budowanie na jego podstawie
+własnych aplikacji — w tym wydawanie klonów w Google Play — wymaga pisemnej zgody właściciela
+praw.
+
+Licencja nie obejmuje komponentów zewnętrznych, które zachowują własne warunki:
+
+| Komponent | Licencja | Szczegóły |
+| --- | --- | --- |
+| Fonty Space Grotesk i Outfit | SIL OFL 1.1 | [`third_party/README.md`](third_party/README.md) |
+| AndroidX, Jetpack Compose, kotlinx.coroutines | Apache 2.0 | `gradle/libs.versions.toml` |
